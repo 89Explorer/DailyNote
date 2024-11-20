@@ -24,7 +24,6 @@ class ImageCollectionViewCell: UICollectionViewCell {
     /// 사용자의 이미지를 보여주는 뷰
     let userImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "new")
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         return imageView

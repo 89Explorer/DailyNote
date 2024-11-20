@@ -123,7 +123,6 @@ class HomeTableViewCell: UITableViewCell {
             
             contentLabel.heightAnchor.constraint(equalToConstant: 150),
             
-            imageCollectionView.widthAnchor.constraint(equalTo: tableStackView.widthAnchor),
             imageCollectionView.heightAnchor.constraint(equalToConstant: 220)
             
         ])
