@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		9D1322D32CEDBAD80037F684 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1322C92CEDBAD80037F684 /* AppDelegate.swift */; };
+		9D1322D52CEDBAD80037F684 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1322CF2CEDBAD80037F684 /* SceneDelegate.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		9D13228B2CEDB9B60037F684 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,27 +32,12 @@
 		9D1322712CEDB9B50037F684 /* DailyNote.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DailyNote.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D13228A2CEDB9B60037F684 /* DailyNoteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DailyNoteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D1322942CEDB9B60037F684 /* DailyNoteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DailyNoteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D1322C92CEDBAD80037F684 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		9D1322CC2CEDBAD80037F684 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9D1322CF2CEDBAD80037F684 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		9D13229C2CEDB9B60037F684 /* Exceptions for "DailyNote" folder in "DailyNote" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 9D1322702CEDB9B50037F684 /* DailyNote */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		9D1322732CEDB9B50037F684 /* DailyNote */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				9D13229C2CEDB9B60037F684 /* Exceptions for "DailyNote" folder in "DailyNote" target */,
-			);
-			path = DailyNote;
-			sourceTree = "<group>";
-		};
 		9D13228D2CEDB9B60037F684 /* DailyNoteTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = DailyNoteTests;
@@ -56,6 +46,26 @@
 		9D1322972CEDB9B60037F684 /* DailyNoteUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = DailyNoteUITests;
+			sourceTree = "<group>";
+		};
+		9D1322DB2CEDBAE10037F684 /* View */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = View;
+			sourceTree = "<group>";
+		};
+		9D1322DD2CEDBAE90037F684 /* Model */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Model;
+			sourceTree = "<group>";
+		};
+		9D1322DE2CEDBAEF0037F684 /* Controller */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		9D1322DF2CEDBAF70037F684 /* Resource */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Resource;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -88,7 +98,7 @@
 		9D1322682CEDB9B50037F684 = {
 			isa = PBXGroup;
 			children = (
-				9D1322732CEDB9B50037F684 /* DailyNote */,
+				9D1322D12CEDBAD80037F684 /* DailyNote */,
 				9D13228D2CEDB9B60037F684 /* DailyNoteTests */,
 				9D1322972CEDB9B60037F684 /* DailyNoteUITests */,
 				9D1322722CEDB9B50037F684 /* Products */,
@@ -103,6 +113,20 @@
 				9D1322942CEDB9B60037F684 /* DailyNoteUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9D1322D12CEDBAD80037F684 /* DailyNote */ = {
+			isa = PBXGroup;
+			children = (
+				9D1322CF2CEDBAD80037F684 /* SceneDelegate.swift */,
+				9D1322C92CEDBAD80037F684 /* AppDelegate.swift */,
+				9D1322CC2CEDBAD80037F684 /* Info.plist */,
+				9D1322DF2CEDBAF70037F684 /* Resource */,
+				9D1322DD2CEDBAE90037F684 /* Model */,
+				9D1322DB2CEDBAE10037F684 /* View */,
+				9D1322DE2CEDBAEF0037F684 /* Controller */,
+			);
+			path = DailyNote;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -121,7 +145,10 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				9D1322732CEDB9B50037F684 /* DailyNote */,
+				9D1322DB2CEDBAE10037F684 /* View */,
+				9D1322DD2CEDBAE90037F684 /* Model */,
+				9D1322DE2CEDBAEF0037F684 /* Controller */,
+				9D1322DF2CEDBAF70037F684 /* Resource */,
 			);
 			name = DailyNote;
 			packageProductDependencies = (
@@ -249,6 +276,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D1322D32CEDBAD80037F684 /* AppDelegate.swift in Sources */,
+				9D1322D52CEDBAD80037F684 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
