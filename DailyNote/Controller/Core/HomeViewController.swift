@@ -18,7 +18,7 @@ class HomeViewController: UIViewController {
     // MARK: - Initializations
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = .systemYellow
         
         //self.navigationController?.navigationBar.isHidden = true
         
@@ -52,20 +52,35 @@ class HomeViewController: UIViewController {
     }
     
     
+    /// 네비게이션바 설정하는 함수
     func setupNavigationBar() {
         let appearance = UINavigationBarAppearance()
-        // appearance.backgroundColor = .systemYellow // 배경을 노란색으로 설정
-        // appearance.shadowColor = .clear      // 그림자 없애기
-        
-        // 그림자 제거하고 기존의 백그라운드 색상을 사용 (그림자를 제거하고 기존 배경색을 사용)
         appearance.configureWithTransparentBackground()
         
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.compactAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
         
-        //navigationController?.navigationBar.isTranslucent = true
-        //navigationController?.navigationBar.shadowImage = UIImage() // 밑줄 없애기
+        let addFeedButton = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(didTappedAddButton))
+        navigationItem.rightBarButtonItem = addFeedButton
+        navigationController?.navigationBar.tintColor = .black
+    }
+    
+    
+    // MARK: - Action
+    /// 네비게이션바의 오른쪽 버튼을 누르면 ActionSheet를 호출하는 함수
+    @objc private func didTappedAddButton() {
+        let actionSheet = UIAlertController(title: "오늘 하루는 어땠나요? 😀", message: nil, preferredStyle: .actionSheet)
+        
+        actionSheet.addAction(UIAlertAction(title: "피드 작성하기", style: .default, handler: { action in
+            print("피드를 작성합니다.")
+            let feedVC = FeedViewController()
+            self.navigationController?.pushViewController(feedVC, animated: true)
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
+        
+        self.present(actionSheet, animated: true)
     }
 }
 
@@ -84,6 +99,11 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         
         return cell
     }
+    
+    // 테이블뷰의 높이를 자동적으로 추청하도록 하는 메서드
+//    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+//        return UITableView.automaticDimension
+//    }
 }
 
 
