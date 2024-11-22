@@ -18,9 +18,7 @@ class HomeViewController: UIViewController {
     // MARK: - Initializations
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemYellow
-        
-        //self.navigationController?.navigationBar.isHidden = true
+        view.backgroundColor = .systemOrange
         
         configureConstraints()
         configureTableView()
@@ -70,10 +68,9 @@ class HomeViewController: UIViewController {
     // MARK: - Action
     /// 네비게이션바의 오른쪽 버튼을 누르면 ActionSheet를 호출하는 함수
     @objc private func didTappedAddButton() {
-        let actionSheet = UIAlertController(title: "오늘 하루는 어땠나요? 😀", message: nil, preferredStyle: .actionSheet)
+        let actionSheet = UIAlertController(title: "오늘 하루는 어땠나요?", message: nil, preferredStyle: .actionSheet)
         
         actionSheet.addAction(UIAlertAction(title: "피드 작성하기", style: .default, handler: { action in
-            print("피드를 작성합니다.")
             let feedVC = FeedViewController()
             self.navigationController?.pushViewController(feedVC, animated: true)
         }))
