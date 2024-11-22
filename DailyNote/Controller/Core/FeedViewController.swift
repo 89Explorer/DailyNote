@@ -9,6 +9,9 @@ import UIKit
 
 class FeedViewController: UIViewController {
     
+    // MARK: - Variables
+    var selectedImages: [UIImage?] = [UIImage(named: "new"), UIImage(named: "Stroll"), UIImage(named: "Tastes") ]
+    
     // MARK: - UI Components
     /// 커스텀 뷰로 생성한 feedView
     let feedView: FeedView = {
@@ -21,8 +24,11 @@ class FeedViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemOrange
         
-        configureTextView()
         configureConstraints()
+        configureTextView()
+        configureCollectionView()
+        
+        didTappedselectedButton()
     }
     
     // MARK: - Layouts
@@ -63,6 +69,24 @@ class FeedViewController: UIViewController {
             textView.textColor = .label
         }
     }
+    
+    /// collectionView 델리게이트를 선언하는 함수 
+    func configureCollectionView() {
+        feedView.selectedImageCollectionView.delegate = self
+        feedView.selectedImageCollectionView.dataSource = self
+        feedView.selectedImageCollectionView.register(SelectedImageCollectionViewCell.self, forCellWithReuseIdentifier: SelectedImageCollectionViewCell.identifier)
+    }
+    
+    /// 이미지 선택 버튼에 액션을 부여한 함수
+    func didTappedselectedButton() {
+        feedView.selectedButton.addTarget(self, action: #selector(didTappedSelectedImages), for: .touchUpInside)
+    }
+    
+    // MARK: - Actions
+    /// 이미지 선택 버튼을 누르면 동작하는 함수
+    @objc private func didTappedSelectedImages() {
+        print("didTappedSelectedImages - called()")
+    }
 }
 
 // MARK: - Extension UITextViewDelegate
@@ -101,5 +125,27 @@ extension FeedViewController: UITextViewDelegate {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         view.endEditing(true)
+    }
+}
+
+// MARK: - Extension UICollectionViewDelegate, UICollectionViewDataSource
+extension FeedViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return selectedImages.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SelectedImageCollectionViewCell.identifier, for: indexPath) as? SelectedImageCollectionViewCell else { return UICollectionViewCell() }
+        
+        if let image = selectedImages[indexPath.row] {
+            cell.configureSelectedImage(with: image)
+        }
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width: CGFloat = 150
+        let height: CGFloat = collectionView.bounds.height
+        return CGSize(width: width, height: height)
     }
 }

@@ -65,14 +65,49 @@ class FeedView: UIView {
         return textView
     }()
     
+    /// 이미지를 선택할 수 있는 버튼
+    let selectedButton: UIButton = {
+        var configuration = UIButton.Configuration.filled()
+        configuration.baseBackgroundColor = .systemOrange
+        configuration.baseForegroundColor = .label
+        
+        configuration.title = "사진 추가"
+        configuration.titleAlignment = .center
+        configuration.subtitle = "(0/10)"
+        configuration.attributedTitle?.font = UIFont.systemFont(ofSize: 16, weight: .heavy)
+        configuration.attributedSubtitle?.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        
+        var imageConfig = UIImage.SymbolConfiguration(pointSize: 20)
+        configuration.preferredSymbolConfigurationForImage = imageConfig
+        configuration.image = UIImage(systemName: "photo.badge.plus")
+        configuration.imagePadding = 10
+        configuration.imagePlacement = .top
+        
+        let button = UIButton(configuration: configuration)
+        return button
+    }()
+    
+    /// 선택한 이미지를 보여주는 컬렉션뷰
+    let selectedImageCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 10
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
+        collectionView.showsHorizontalScrollIndicator = false
+        return collectionView
+    }()
+    
     
     // MARK: - Initializations
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .systemOrange
         
-        configureTextView()
         configureConstraints()
+        configureTextView()
+        configureCollectionView()
     }
     
     required init?(coder: NSCoder) {
@@ -85,11 +120,15 @@ class FeedView: UIView {
         basicView.addSubview(titleTextView)
         basicView.addSubview(dateLabel)
         basicView.addSubview(contentTextView)
+        basicView.addSubview(selectedButton)
+        basicView.addSubview(selectedImageCollectionView)
         
         basicView.translatesAutoresizingMaskIntoConstraints = false
         titleTextView.translatesAutoresizingMaskIntoConstraints = false
         dateLabel.translatesAutoresizingMaskIntoConstraints = false
         contentTextView.translatesAutoresizingMaskIntoConstraints = false
+        selectedButton.translatesAutoresizingMaskIntoConstraints = false
+        selectedImageCollectionView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             
@@ -111,8 +150,17 @@ class FeedView: UIView {
             contentTextView.leadingAnchor.constraint(equalTo: basicView.leadingAnchor, constant: 10),
             contentTextView.trailingAnchor.constraint(equalTo: basicView.trailingAnchor, constant: -10),
             contentTextView.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 10),
-            contentTextView.heightAnchor.constraint(equalToConstant: 350),
+            contentTextView.heightAnchor.constraint(equalToConstant: 400),
             
+            selectedButton.leadingAnchor.constraint(equalTo: basicView.leadingAnchor, constant: 10),
+            selectedButton.topAnchor.constraint(equalTo: contentTextView.bottomAnchor, constant: 20),
+            selectedButton.bottomAnchor.constraint(equalTo: basicView.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            selectedButton.widthAnchor.constraint(equalToConstant: 100),
+            
+            selectedImageCollectionView.leadingAnchor.constraint(equalTo: selectedButton.trailingAnchor, constant: 10),
+            selectedImageCollectionView.topAnchor.constraint(equalTo: contentTextView.bottomAnchor, constant: 20),
+            selectedImageCollectionView.trailingAnchor.constraint(equalTo: basicView.trailingAnchor, constant: -10),
+            selectedImageCollectionView.bottomAnchor.constraint(equalTo: basicView.safeAreaLayoutGuide.bottomAnchor, constant: -20)
             
         ])
     }
@@ -134,4 +182,9 @@ class FeedView: UIView {
         return contentTextView
     }
     
+    /// selectedImageCollectionView 관련 델리게이트 설정하는 함수
+    func configureCollectionView() {
+        selectedImageCollectionView.delegate = nil
+        selectedImageCollectionView.dataSource = nil
+    }
 }
