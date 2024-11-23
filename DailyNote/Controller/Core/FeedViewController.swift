@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import PhotosUI
 
 class FeedViewController: UIViewController {
     
@@ -86,12 +87,20 @@ class FeedViewController: UIViewController {
     /// 이미지 선택 버튼을 누르면 동작하는 함수
     @objc private func didTappedSelectedImages() {
         print("didTappedSelectedImages - called()")
+        
+        // PHPickerConfiguration 설정
+        var configuration = PHPickerConfiguration()
+        configuration.selectionLimit = 5   // 선택 가능한 이미지 또는 영상 개수
+        configuration.filter = .any(of: [.images])   // 이미지 선택 가능
+        
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        present(picker, animated: true)
     }
 }
 
 // MARK: - Extension UITextViewDelegate
 extension FeedViewController: UITextViewDelegate {
-    
     
     func textViewDidBeginEditing(_ textView: UITextView) {
         
@@ -147,5 +156,24 @@ extension FeedViewController: UICollectionViewDelegate, UICollectionViewDataSour
         let width: CGFloat = 150
         let height: CGFloat = collectionView.bounds.height
         return CGSize(width: width, height: height)
+    }
+}
+
+
+extension FeedViewController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        
+        let imageItems = results.prefix(5)
+        
+        for item in imageItems {
+            item.itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
+                if let image = image as? UIImage {
+                    DispatchQueue.main.async {
+                        print("Selected image: \(image)")
+                    }
+                }
+            }
+        }
     }
 }
