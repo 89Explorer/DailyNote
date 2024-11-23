@@ -29,7 +29,8 @@ class FeedViewController: UIViewController {
         configureTextView()
         configureCollectionView()
         
-        didTappedselectedButton()
+        feedView.delegate = self
+        //didTappedselectedButton()
     }
     
     // MARK: - Layouts
@@ -76,26 +77,6 @@ class FeedViewController: UIViewController {
         feedView.selectedImageCollectionView.delegate = self
         feedView.selectedImageCollectionView.dataSource = self
         feedView.selectedImageCollectionView.register(SelectedImageCollectionViewCell.self, forCellWithReuseIdentifier: SelectedImageCollectionViewCell.identifier)
-    }
-    
-    /// 이미지 선택 버튼에 액션을 부여한 함수
-    func didTappedselectedButton() {
-        feedView.selectedButton.addTarget(self, action: #selector(didTappedSelectedImages), for: .touchUpInside)
-    }
-    
-    // MARK: - Actions
-    /// 이미지 선택 버튼을 누르면 동작하는 함수
-    @objc private func didTappedSelectedImages() {
-        print("didTappedSelectedImages - called()")
-        
-        // PHPickerConfiguration 설정
-        var configuration = PHPickerConfiguration()
-        configuration.selectionLimit = 5   // 선택 가능한 이미지 또는 영상 개수
-        configuration.filter = .any(of: [.images])   // 이미지 선택 가능
-        
-        let picker = PHPickerViewController(configuration: configuration)
-        picker.delegate = self
-        present(picker, animated: true)
     }
 }
 
@@ -159,8 +140,20 @@ extension FeedViewController: UICollectionViewDelegate, UICollectionViewDataSour
     }
 }
 
-
+// MARK: - extension PHPickerViewControllerDelegate
 extension FeedViewController: PHPickerViewControllerDelegate {
+    
+    /// 갤러리 창을 띄워 이미지를 선택할 수 있도록 해주는 함수
+    private func presentImagePicker() {
+        var configuration = PHPickerConfiguration()
+        configuration.selectionLimit = 5   // 선택 가능한 이미지 또는 영상 개수
+        configuration.filter = .any(of: [.images])   // 이미지 선택 가능
+        
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        present(picker, animated: true)
+    }
+    
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
         
@@ -175,5 +168,13 @@ extension FeedViewController: PHPickerViewControllerDelegate {
                 }
             }
         }
+    }
+}
+
+// MARK: - extension FeedViewDelegate
+extension FeedViewController: FeedViewDelegate {
+    func didTapSelectedImageButton() {
+        print("delegate called")
+        presentImagePicker()
     }
 }

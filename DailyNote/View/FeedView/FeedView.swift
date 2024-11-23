@@ -9,8 +9,10 @@ import UIKit
 
 class FeedView: UIView {
     
-    // MARK: - UI Components
+    // MARK: - Variables
+    weak var delegate: FeedViewDelegate?
     
+    // MARK: - UI Components
     /// 배경이 되는 뷰
     let basicView: UIView = {
         let view = UIView()
@@ -108,6 +110,8 @@ class FeedView: UIView {
         configureConstraints()
         configureTextView()
         configureCollectionView()
+        
+        selectedButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
     }
     
     required init?(coder: NSCoder) {
@@ -187,4 +191,16 @@ class FeedView: UIView {
         selectedImageCollectionView.delegate = nil
         selectedImageCollectionView.dataSource = nil
     }
+    
+    // MARK: - Action
+    @objc private func buttonTapped() {
+        delegate?.didTapSelectedImageButton()
+    }
+}
+
+
+// MARK: - Protocol FeedViewDelegate
+/// FeedView에서 발생하는 이벤트를 FeedViewController로 전달하는 역할
+protocol FeedViewDelegate: AnyObject {
+    func didTapSelectedImageButton()
 }
