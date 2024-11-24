@@ -14,6 +14,8 @@ class FeedViewController: UIViewController {
     /// 사용자가 선택한 이미지를 저장하는 배열
     //var selectedImages: [UIImage?] = [UIImage(named: "new"), UIImage(named: "Stroll"), UIImage(named: "Tastes") ]
     var selectedImages: [UIImage?] = []
+    var selectedImagesCount: Int = 0
+    var selectedMaxImage: Int = 5
     
     
     // MARK: - UI Components
@@ -147,20 +149,23 @@ extension FeedViewController: PHPickerViewControllerDelegate {
     
     /// 갤러리 창을 띄워 이미지를 선택할 수 있도록 해주는 함수
     private func presentImagePicker() {
+  
         var configuration = PHPickerConfiguration()
-        configuration.selectionLimit = 5   // 선택 가능한 이미지 또는 영상 개수
         configuration.filter = .any(of: [.images])   // 이미지 선택 가능
         configuration.selection = .ordered    // 순서 보장
         
         configuration.preferredAssetRepresentationMode = .automatic
         
-//        let picker = PHPickerViewController(configuration: configuration)
-//        picker.delegate = self
-//        present(picker, animated: true)
-        
-        // 개선 적용
         /* 선택가능한 사진 수를 채운 뒤에도 버튼을 누를 경우 경고창 띄움 */
-        if self.selectedImages.count <= 5 {
+        
+        if self.selectedImagesCount == 0 {
+            configuration.selectionLimit = selectedMaxImage
+            
+            let picker = PHPickerViewController(configuration: configuration)
+            picker.delegate = self
+            present(picker, animated: true)
+        } else if self.selectedImagesCount != 0 && self.selectedImagesCount < selectedMaxImage {
+            configuration.selectionLimit = selectedMaxImage - self.selectedImagesCount
             let picker = PHPickerViewController(configuration: configuration)
             picker.delegate = self
             present(picker, animated: true)
@@ -173,7 +178,6 @@ extension FeedViewController: PHPickerViewControllerDelegate {
             alert.addAction(close)
             self.present(alert, animated: true)
         }
-
     }
     
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
@@ -188,9 +192,11 @@ extension FeedViewController: PHPickerViewControllerDelegate {
                     // 이미지를 로드한 경우
                     DispatchQueue.main.async {
                         print("Selected image: \(image)")
-                        // newImages.append(image)
                         self.selectedImages.append(image)
- 
+                        self.selectedImagesCount = self.selectedImages.count
+                        self.feedView.imageCounts = self.selectedImagesCount
+                        self.feedView.updateButtonSubtitle()
+                        
                         if self.selectedImages.count <= 5 {
                             self.feedView.selectedImageCollectionView.reloadData()
                         }
@@ -201,9 +207,6 @@ extension FeedViewController: PHPickerViewControllerDelegate {
             }
         }
     }
-
-
-    
 }
 
 // MARK: - extension FeedViewDelegate

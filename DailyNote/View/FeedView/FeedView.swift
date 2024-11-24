@@ -11,6 +11,7 @@ class FeedView: UIView {
     
     // MARK: - Variables
     weak var delegate: FeedViewDelegate?
+    var imageCounts: Int = 0
     
     // MARK: - UI Components
     /// 배경이 되는 뷰
@@ -75,7 +76,7 @@ class FeedView: UIView {
         
         configuration.title = "사진 추가"
         configuration.titleAlignment = .center
-        configuration.subtitle = "(0/10)"
+        configuration.subtitle = ""
         configuration.attributedTitle?.font = UIFont.systemFont(ofSize: 16, weight: .heavy)
         configuration.attributedSubtitle?.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         
@@ -112,6 +113,8 @@ class FeedView: UIView {
         configureCollectionView()
         
         selectedButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        
+        selectedButton.subtitleLabel?.text = "\(self.imageCounts) / 5"
     }
     
     required init?(coder: NSCoder) {
@@ -190,6 +193,13 @@ class FeedView: UIView {
     func configureCollectionView() {
         selectedImageCollectionView.delegate = nil
         selectedImageCollectionView.dataSource = nil
+    }
+    
+    /// 이미지 선택하는 버튼 아래에 SubTitle 설정하는 함수 
+    func updateButtonSubtitle() {
+        var updatedConfig = selectedButton.configuration
+        updatedConfig?.subtitle = "\(self.imageCounts) / 5"
+        selectedButton.configuration = updatedConfig
     }
     
     // MARK: - Action
