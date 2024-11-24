@@ -82,6 +82,20 @@ class FeedViewController: UIViewController {
         feedView.selectedImageCollectionView.dataSource = self
         feedView.selectedImageCollectionView.register(SelectedImageCollectionViewCell.self, forCellWithReuseIdentifier: SelectedImageCollectionViewCell.identifier)
     }
+    
+    /// 이미자가 추가될 때마다 업데이트 되는 함수
+    func updateUIAfterImageSelection() {
+        feedView.imageCounts = selectedImagesCount
+        feedView.updateButtonSubtitle()
+        feedView.selectedImageCollectionView.reloadData()
+    }
+    
+    /// 경고창을 재사용할 수 있는 함수
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default))
+        present(alert, animated: true)
+    }
 }
 
 // MARK: - Extension UITextViewDelegate
@@ -149,34 +163,23 @@ extension FeedViewController: PHPickerViewControllerDelegate {
     
     /// 갤러리 창을 띄워 이미지를 선택할 수 있도록 해주는 함수
     private func presentImagePicker() {
-  
+        
         var configuration = PHPickerConfiguration()
         configuration.filter = .any(of: [.images])   // 이미지 선택 가능
         configuration.selection = .ordered    // 순서 보장
+        configuration.preferredAssetRepresentationMode = .automatic  // 사용자가 선택한 이미지 또는 동영상 파일을 어떤 형태로 앱에 전달할지 결정
         
-        configuration.preferredAssetRepresentationMode = .automatic
+        // 선택 가능한 이미지 갯수 설정
+        let remainingSelectionLimit = selectedMaxImage - selectedImagesCount
         
-        /* 선택가능한 사진 수를 채운 뒤에도 버튼을 누를 경우 경고창 띄움 */
-        
-        if self.selectedImagesCount == 0 {
-            configuration.selectionLimit = selectedMaxImage
+        if remainingSelectionLimit > 0 {
+            configuration.selectionLimit = remainingSelectionLimit
             
-            let picker = PHPickerViewController(configuration: configuration)
-            picker.delegate = self
-            present(picker, animated: true)
-        } else if self.selectedImagesCount != 0 && self.selectedImagesCount < selectedMaxImage {
-            configuration.selectionLimit = selectedMaxImage - self.selectedImagesCount
             let picker = PHPickerViewController(configuration: configuration)
             picker.delegate = self
             present(picker, animated: true)
         } else {
-            let alert = UIAlertController(title: "알림", message: "선택할 수 있는 사진 수를 넘기셨어요 😅", preferredStyle: .alert)
-            let confirm = UIAlertAction(title: "확인", style: .default)
-            let close = UIAlertAction(title: "닫기", style: .destructive)
-            
-            alert.addAction(confirm)
-            alert.addAction(close)
-            self.present(alert, animated: true)
+            showAlert(title: "알림", message: "선택할 수 있는 사진 수를 넘기셨어요 😅")
         }
     }
     
@@ -194,15 +197,13 @@ extension FeedViewController: PHPickerViewControllerDelegate {
                         print("Selected image: \(image)")
                         self.selectedImages.append(image)
                         self.selectedImagesCount = self.selectedImages.count
-                        self.feedView.imageCounts = self.selectedImagesCount
-                        self.feedView.updateButtonSubtitle()
-                        
-                        if self.selectedImages.count <= 5 {
-                            self.feedView.selectedImageCollectionView.reloadData()
-                        }
+                        self.updateUIAfterImageSelection()
                     }
                 } else if let error = error {
-                    print("Error loading image: \(error.localizedDescription)")
+                    DispatchQueue.main.async {
+                        self.showAlert(title: "에러", message: "이미지를 불러오는 데 실패했습니다: \(error.localizedDescription)")
+                        print("Error loading image: \(error.localizedDescription)")
+                    }
                 }
             }
         }
