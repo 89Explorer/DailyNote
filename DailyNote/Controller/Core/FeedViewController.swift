@@ -11,7 +11,10 @@ import PhotosUI
 class FeedViewController: UIViewController {
     
     // MARK: - Variables
-    var selectedImages: [UIImage?] = [UIImage(named: "new"), UIImage(named: "Stroll"), UIImage(named: "Tastes") ]
+    /// 사용자가 선택한 이미지를 저장하는 배열
+    //var selectedImages: [UIImage?] = [UIImage(named: "new"), UIImage(named: "Stroll"), UIImage(named: "Tastes") ]
+    var selectedImages: [UIImage?] = []
+    
     
     // MARK: - UI Components
     /// 커스텀 뷰로 생성한 feedView
@@ -30,7 +33,6 @@ class FeedViewController: UIViewController {
         configureCollectionView()
         
         feedView.delegate = self
-        //didTappedselectedButton()
     }
     
     // MARK: - Layouts
@@ -72,7 +74,7 @@ class FeedViewController: UIViewController {
         }
     }
     
-    /// collectionView 델리게이트를 선언하는 함수 
+    /// collectionView 델리게이트를 선언하는 함수
     func configureCollectionView() {
         feedView.selectedImageCollectionView.delegate = self
         feedView.selectedImageCollectionView.dataSource = self
@@ -103,7 +105,7 @@ extension FeedViewController: UITextViewDelegate {
     }
     
     func textViewDidChange(_ textView: UITextView) {
-        /// 타이틀 텍스트뷰에 글자수 제한을 위한 변수 
+        /// 타이틀 텍스트뷰에 글자수 제한을 위한 변수
         let maxTitleLength: Int = 20
         
         if textView == feedView.calledTitleTextView() {
@@ -127,9 +129,9 @@ extension FeedViewController: UICollectionViewDelegate, UICollectionViewDataSour
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SelectedImageCollectionViewCell.identifier, for: indexPath) as? SelectedImageCollectionViewCell else { return UICollectionViewCell() }
         
-        if let image = selectedImages[indexPath.row] {
-            cell.configureSelectedImage(with: image)
-        }
+        let image = selectedImages[indexPath.row]
+        cell.configureSelectedImage(with: image!)
+        
         return cell
     }
     
@@ -148,33 +150,65 @@ extension FeedViewController: PHPickerViewControllerDelegate {
         var configuration = PHPickerConfiguration()
         configuration.selectionLimit = 5   // 선택 가능한 이미지 또는 영상 개수
         configuration.filter = .any(of: [.images])   // 이미지 선택 가능
+        configuration.selection = .ordered    // 순서 보장
         
-        let picker = PHPickerViewController(configuration: configuration)
-        picker.delegate = self
-        present(picker, animated: true)
+        configuration.preferredAssetRepresentationMode = .automatic
+        
+//        let picker = PHPickerViewController(configuration: configuration)
+//        picker.delegate = self
+//        present(picker, animated: true)
+        
+        // 개선 적용
+        /* 선택가능한 사진 수를 채운 뒤에도 버튼을 누를 경우 경고창 띄움 */
+        if self.selectedImages.count <= 5 {
+            let picker = PHPickerViewController(configuration: configuration)
+            picker.delegate = self
+            present(picker, animated: true)
+        } else {
+            let alert = UIAlertController(title: "알림", message: "선택할 수 있는 사진 수를 넘기셨어요 😅", preferredStyle: .alert)
+            let confirm = UIAlertAction(title: "확인", style: .default)
+            let close = UIAlertAction(title: "닫기", style: .destructive)
+            
+            alert.addAction(confirm)
+            alert.addAction(close)
+            self.present(alert, animated: true)
+        }
+
     }
     
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
         
-        let imageItems = results.prefix(5)
-        
-        for item in imageItems {
-            item.itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
+        for item in results {
+            // itemProvider로 이미지를 로드
+            item.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] (image, error) in
+                guard let self = self else { return }
+                
                 if let image = image as? UIImage {
+                    // 이미지를 로드한 경우
                     DispatchQueue.main.async {
                         print("Selected image: \(image)")
+                        // newImages.append(image)
+                        self.selectedImages.append(image)
+ 
+                        if self.selectedImages.count <= 5 {
+                            self.feedView.selectedImageCollectionView.reloadData()
+                        }
                     }
+                } else if let error = error {
+                    print("Error loading image: \(error.localizedDescription)")
                 }
             }
         }
     }
+
+
+    
 }
 
 // MARK: - extension FeedViewDelegate
 extension FeedViewController: FeedViewDelegate {
     func didTapSelectedImageButton() {
-        print("delegate called")
         presentImagePicker()
     }
 }
