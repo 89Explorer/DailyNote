@@ -29,6 +29,7 @@ class FeedView: UIView {
     let titleTextView: UITextView = {
         let textView = UITextView()
         textView.text = "오늘 하루는 어땠나요?😀 (20자 이내)"
+        textView.isEditable = true
         textView.backgroundColor = .systemBackground
         textView.layer.cornerRadius = 5
         textView.textAlignment = .left
@@ -44,7 +45,6 @@ class FeedView: UIView {
     /// 작성한 날짜를 받는 라벨
     let dateLabel: UILabel = {
         let label = UILabel()
-        label.text = "2024년 12월 1일 PM 09:00"
         label.backgroundColor = .systemBackground
         label.layer.cornerRadius = 5
         label.textAlignment = .center
@@ -59,6 +59,7 @@ class FeedView: UIView {
     let contentTextView: UITextView = {
         let textView = UITextView()
         textView.text = "오늘 하루 고생했어요. 당신의 하루를 들려주세요 ❤️"
+        textView.isEditable = true
         textView.backgroundColor = .systemBackground
         textView.layer.cornerRadius = 5
         textView.layer.borderWidth = 1
@@ -111,10 +112,10 @@ class FeedView: UIView {
         configureConstraints()
         configureTextView()
         configureCollectionView()
+        dateLabel.text = Date().formatted()
         
         selectedButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         
-        selectedButton.subtitleLabel?.text = "\(self.imageCounts) / 5"
     }
     
     required init?(coder: NSCoder) {
@@ -201,6 +202,7 @@ class FeedView: UIView {
         updatedConfig?.subtitle = "\(self.imageCounts) / 5"
         selectedButton.configuration = updatedConfig
     }
+    
     
     // MARK: - Action
     @objc private func buttonTapped() {

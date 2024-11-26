@@ -9,9 +9,13 @@ import UIKit
 
 class HomeViewController: UIViewController {
     
+    // MARK: - Variables
+    var feedItems: [FeedManager] = []
+    
     // MARK: - UI Components
     let homeView: HomeView = {
         let homeView = HomeView()
+        homeView.backgroundColor = .clear
         return homeView
     }()
     
@@ -23,6 +27,15 @@ class HomeViewController: UIViewController {
         configureConstraints()
         configureTableView()
         setupNavigationBar()
+        
+        feedItems = FeedCoreDataManager.shared.loadFeedItem()
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        feedItems = FeedCoreDataManager.shared.loadFeedItem()
+        homeView.homeTableView.reloadData()
     }
     
     // MARK: - Layouts
@@ -33,10 +46,14 @@ class HomeViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             
-            homeView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 5),
-            homeView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 5),
-            homeView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -5),
-            homeView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            homeView.leadingAnchor.constraint(
+                equalTo: view.leadingAnchor, constant: 5),
+            homeView.topAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 5),
+            homeView.trailingAnchor.constraint(
+                equalTo: view.trailingAnchor, constant: -5),
+            homeView.bottomAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             
         ])
     }
@@ -46,9 +63,10 @@ class HomeViewController: UIViewController {
         let homeTable = homeView.homeTableView
         homeTable.delegate = self
         homeTable.dataSource = self
-        homeTable.register(HomeTableViewCell.self, forCellReuseIdentifier: HomeTableViewCell.identifier)
+        homeTable.register(
+            HomeTableViewCell.self,
+            forCellReuseIdentifier: HomeTableViewCell.identifier)
     }
-    
     
     /// 네비게이션바 설정하는 함수
     func setupNavigationBar() {
@@ -59,23 +77,32 @@ class HomeViewController: UIViewController {
         navigationController?.navigationBar.compactAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
         
-        let addFeedButton = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(didTappedAddButton))
+        let addFeedButton = UIBarButtonItem(
+            image: UIImage(systemName: "plus"), style: .plain, target: self,
+            action: #selector(didTappedAddButton))
         navigationItem.rightBarButtonItem = addFeedButton
         navigationController?.navigationBar.tintColor = .black
     }
     
-    
     // MARK: - Action
     /// 네비게이션바의 오른쪽 버튼을 누르면 ActionSheet를 호출하는 함수
     @objc private func didTappedAddButton() {
-        let actionSheet = UIAlertController(title: "오늘 하루는 어땠나요?", message: nil, preferredStyle: .actionSheet)
+        let actionSheet = UIAlertController(
+            title: "오늘 하루는 어땠나요?", message: nil, preferredStyle: .actionSheet)
         
-        actionSheet.addAction(UIAlertAction(title: "피드 작성하기", style: .default, handler: { action in
-            let feedVC = FeedViewController()
-            self.navigationController?.pushViewController(feedVC, animated: true)
-        }))
+        actionSheet.addAction(
+            UIAlertAction(
+                title: "피드 작성하기", style: .default,
+                handler: { action in
+                    let feedVC = FeedViewController()
+                    feedVC.feedView.titleTextView.isEditable = true
+                    feedVC.feedView.contentTextView.isEditable = true
+                    self.navigationController?.pushViewController(
+                        feedVC, animated: true)
+                }))
         
-        actionSheet.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
+        actionSheet.addAction(
+            UIAlertAction(title: "취소", style: .cancel, handler: nil))
         
         self.present(actionSheet, animated: true)
     }
@@ -83,16 +110,30 @@ class HomeViewController: UIViewController {
 
 // MARK: - Extension: UITableViewDelegate, UITableViewDataSource
 extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int)
+    -> Int
+    {
+        return feedItems.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: HomeTableViewCell.identifier, for: indexPath) as? HomeTableViewCell else { return UITableViewCell() }
-        cell.backgroundColor = .clear
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath)
+    -> UITableViewCell
+    {
+        guard
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: HomeTableViewCell.identifier, for: indexPath)
+                as? HomeTableViewCell
+        else { return UITableViewCell() }
         
-        cell.imageCollectionView.delegate = self
-        cell.imageCollectionView.dataSource = self
+        
+        cell.backgroundColor = .clear
+        cell.selectionStyle = .none
+        
+        let feed = feedItems[indexPath.row].feed
+        let imagePaths = feedItems[indexPath.row].feed.imagePath
+        
+        cell.imagePaths = imagePaths
+        cell.configureFeed(with: feed)
         
         return cell
     }
@@ -104,19 +145,3 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
 }
 
 
-// MARK: - Extension: UICollectionViewDelegate, UICollectionViewDataSource
-extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ImageCollectionViewCell.identifier, for: indexPath) as? ImageCollectionViewCell else { return UICollectionViewCell() }
-        
-        guard let selectedImage = UIImage(named: "new") else { return UICollectionViewCell()}
-        cell.configureUserImage(with: selectedImage)
-        
-        return cell
-    }
-    
-}

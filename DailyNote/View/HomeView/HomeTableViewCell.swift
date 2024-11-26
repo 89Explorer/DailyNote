@@ -12,6 +12,9 @@ class HomeTableViewCell: UITableViewCell {
     // MARK: - Variables
     static let identifier = "HomeTableViewCell"
     
+    var imagePaths: [String] = []
+    var imageFromPaths: [UIImage] = []
+    
     // MARK: - UI Components
     /// 배경이 되는 뷰
     let basicView: UIView = {
@@ -64,13 +67,13 @@ class HomeTableViewCell: UITableViewCell {
         label.font = UIFont.systemFont(ofSize: 18, weight: .regular)
         return label
     }()
-
+    
     /// 이미지를 보여줄 컬렉션뷰
     let imageCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 10
         layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: 150, height: 220)
+        layout.itemSize = CGSize(width: 120, height: 180)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -121,19 +124,59 @@ class HomeTableViewCell: UITableViewCell {
             tableStackView.topAnchor.constraint(equalTo: basicView.topAnchor, constant: 10),
             tableStackView.bottomAnchor.constraint(equalTo: basicView.bottomAnchor, constant: -10),
             
-            contentLabel.heightAnchor.constraint(equalToConstant: 150),
+            contentLabel.heightAnchor.constraint(equalToConstant: 100),
             
-            imageCollectionView.heightAnchor.constraint(equalToConstant: 220)
+            imageCollectionView.heightAnchor.constraint(equalToConstant: 180)
             
         ])
         
     }
     
     // MARK: - Functions
-    /// ImageCollectionView에 대한 델리게이트, 데이터소스, 레지스트를 처리하는 함수 
+    /// ImageCollectionView에 대한 델리게이트, 데이터소스, 레지스트를 처리하는 함수
     private func configureCollectionView() {
-        imageCollectionView.delegate = nil
-        imageCollectionView.dataSource = nil
+        imageCollectionView.delegate = self
+        imageCollectionView.dataSource = self
         imageCollectionView.register(ImageCollectionViewCell.self, forCellWithReuseIdentifier: ImageCollectionViewCell.identifier)
+    }
+    
+    
+    /// 사용자가 작성한 데이터를 홈 화면에 전달하는 함수
+    func configureFeed(with feed: Feed) {
+        let title = feed.title ?? ""
+        let date = feed.date
+        let contents = feed.contents ?? ""
+    
+        mainTitleLabel.text = title
+        dateLabel.text = date?.formatted()
+        contentLabel.text = contents
+        
+        reloadCollectionView()
+    }
+    
+    /// 이미지 경로를 갖고 파일 매니저로부터 이미지를 불러오는 함수 
+    func reloadCollectionView() {
+        self.imageFromPaths = FeedStorageManager().loadImages(from: imagePaths)
+        print("Reloading collection view with imagePaths: \(imagePaths)") // 추가
+        imageCollectionView.reloadData()
+    }
+}
+
+
+// MARK: Extension: UICollectionViewDelegate, UICollectionViewDataSource
+extension HomeTableViewCell: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return imageFromPaths.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ImageCollectionViewCell.identifier, for: indexPath) as? ImageCollectionViewCell else { return UICollectionViewCell() }
+        
+        cell.backgroundColor = .clear
+        
+        let image = imageFromPaths[indexPath.item]
+        cell.configureUserImage(with: image)
+        return cell
     }
 }

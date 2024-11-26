@@ -13,9 +13,11 @@ class FeedViewController: UIViewController {
     // MARK: - Variables
     /// 사용자가 선택한 이미지를 저장하는 배열
     //var selectedImages: [UIImage?] = [UIImage(named: "new"), UIImage(named: "Stroll"), UIImage(named: "Tastes") ]
-    var selectedImages: [UIImage?] = []
+    var selectedImages: [UIImage] = []
     var selectedImagesCount: Int = 0
     var selectedMaxImage: Int = 5
+    
+    var feedStorageManager = FeedStorageManager()
     
     
     // MARK: - UI Components
@@ -35,6 +37,9 @@ class FeedViewController: UIViewController {
         configureCollectionView()
         
         feedView.delegate = self
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "추가", style: .plain, target: self, action: #selector(didAddFeed))
+        
     }
     
     // MARK: - Layouts
@@ -96,6 +101,54 @@ class FeedViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "확인", style: .default))
         present(alert, animated: true)
     }
+    
+    /// 사용자가 작성한 피드를 저장하는 함수
+    func savedFeedItem(feed: Feed, image: [UIImage]) {
+        
+        // FeedManager를 사용해 새로운 피드 작성
+        let feedManager = FeedManager(feed: feed)
+        
+        // PHPPicker로 선택된 이미지를 저장하고 경로 생성
+        let imagePaths = FeedStorageManager().saveImages(images: image, feedID: feedManager.id.uuidString)
+        
+        // 이미지 경로를 포함한 새로운 Feed 생성
+        let updatedFeed = Feed(
+            title: feed.title,
+            contents: feed.contents,
+            date: feed.date,
+            imagePath: imagePaths
+        )
+        
+        // FeedManager 업데이트
+        let updatedFeedManager = FeedManager(id: feedManager.id, feed: updatedFeed)
+        
+        // Core Data에 저장
+        FeedCoreDataManager().saveFeedItem(feedItem: updatedFeedManager)
+        print("Feed saved successfully with ID: \(updatedFeedManager.id)")
+    }
+    
+    // MARK: - Action
+    /// 네비게이션바의 추가 버튼을 누를 경우 동작할 액션
+    @objc func didAddFeed() {
+        print("didAddFeed() called")
+        
+        let title = feedView.titleTextView.text
+        let date = Date()
+        let content = feedView.contentTextView.text
+        
+        let newFeed = Feed(
+            title: title,
+            contents: content,
+            date: date,
+            imagePath: []
+        )
+        
+        let selectedImages = self.selectedImages
+        
+        savedFeedItem(feed: newFeed, image: selectedImages)
+        
+        navigationController?.popViewController(animated: true)
+    }
 }
 
 // MARK: - Extension UITextViewDelegate
@@ -138,6 +191,7 @@ extension FeedViewController: UITextViewDelegate {
 
 // MARK: - Extension UICollectionViewDelegate, UICollectionViewDataSource
 extension FeedViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return selectedImages.count
     }
@@ -146,7 +200,7 @@ extension FeedViewController: UICollectionViewDelegate, UICollectionViewDataSour
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SelectedImageCollectionViewCell.identifier, for: indexPath) as? SelectedImageCollectionViewCell else { return UICollectionViewCell() }
         
         let image = selectedImages[indexPath.row]
-        cell.configureSelectedImage(with: image!)
+        cell.configureSelectedImage(with: image)
         
         return cell
     }

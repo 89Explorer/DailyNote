@@ -16,6 +16,7 @@ class ImageCollectionViewCell: UICollectionViewCell {
     /// 배경이 되는 뷰
     let basicView: UIView = {
         let view = UIView()
+        view.backgroundColor = .clear
         view.layer.cornerRadius = 10
         view.clipsToBounds = true
         return view 
@@ -69,8 +70,7 @@ class ImageCollectionViewCell: UICollectionViewCell {
     // MARK: - Functions
     /// 사용자가 선택한 이미지를 userImageView에 할당하는 함수
     func configureUserImage(with image: UIImage) {
-        
+
         userImageView.image = image
-        
     }
 }
