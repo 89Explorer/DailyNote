@@ -15,24 +15,7 @@ class FeedCoreDataManager {
     static let shared = FeedCoreDataManager()
     private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     private let feedStorageManager = FeedStorageManager()
-    
-    
-    /// 고유 ID를 기반으로 한 이미지 경로 매핑
-    private(set) var imagePathsByID: [UUID: [String]] = [:]
-    
-    
-    /// Feed 데이터를 Core Data에서 로드하고, ID 기반 이미지 매핑 초기화
-    func initializeFeedData() -> [FeedManager] {
-        let feedItems = loadFeedItem() // Core Data에서 Feed 데이터 불러오기
-        imagePathsByID = [:] // 초기화
-        
-        for feed in feedItems {
-            //imagePathsByID[feed.id] = feed.imagePath
-        }
-        return feedItems
-    }
-    
-    
+
     /// 코어 데이터에 사용자가 작성한 내용 저장하는 메서드
     func saveFeedItem(feedItem: FeedManager) {
         let feedModel = FeedModel(context: context)

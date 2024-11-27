@@ -20,6 +20,7 @@ class FeedStorageManager {
     
     /// 이미지를 저장하고 경로를 반환하는 함수
     func saveImages(images: [UIImage], feedID: String) -> [String] {
+        
         let feedFolder = getDocumentsDirectory().appendingPathComponent(feedID)
         
         // 폴더가 없다면? 생성
@@ -43,9 +44,9 @@ class FeedStorageManager {
         return savedImagesPaths
     }
     
-    
     /// 저장한 이미지를 상대경로를 통해 불러오는 함수
     func loadImages(from relativePaths: [String]) -> [UIImage] {
+       
         var images: [UIImage] = []
         
         for relativePath in relativePaths {
@@ -55,6 +56,7 @@ class FeedStorageManager {
                 images.append(image)
             }
         }
+        
         print("load image: \(images)")
         return images
     }
@@ -72,5 +74,4 @@ class FeedStorageManager {
             }
         }
     }
-
 }
