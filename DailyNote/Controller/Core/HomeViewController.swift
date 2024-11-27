@@ -87,6 +87,7 @@ class HomeViewController: UIViewController {
     // MARK: - Action
     /// 네비게이션바의 오른쪽 버튼을 누르면 ActionSheet를 호출하는 함수
     @objc private func didTappedAddButton() {
+    
         let actionSheet = UIAlertController(
             title: "오늘 하루는 어땠나요?", message: nil, preferredStyle: .actionSheet)
         
@@ -95,8 +96,7 @@ class HomeViewController: UIViewController {
                 title: "피드 작성하기", style: .default,
                 handler: { action in
                     let feedVC = FeedViewController()
-                    feedVC.feedView.titleTextView.isEditable = true
-                    feedVC.feedView.contentTextView.isEditable = true
+        
                     self.navigationController?.pushViewController(
                         feedVC, animated: true)
                 }))
@@ -139,9 +139,16 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     // 테이블뷰의 높이를 자동적으로 추청하도록 하는 메서드
-//    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-//        return UITableView.automaticDimension
-//    }
+    //    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+    //        return UITableView.automaticDimension
+    //    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let selectedFeedItem = feedItems[indexPath.row]
+        print("테이블 뷰에 눌린 셀: \(selectedFeedItem)")
+        let feedVC = FeedViewController(feedItem: selectedFeedItem)
+        navigationController?.pushViewController(feedVC, animated: true)
+    }
 }
 
 

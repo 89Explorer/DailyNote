@@ -17,6 +17,10 @@ class FeedViewController: UIViewController {
     var selectedImagesCount: Int = 0
     var selectedMaxImage: Int = 5
     
+    // HomeViewController의 테이블로 부터 받은 데이터를 저장하는 프로퍼티
+    var selectedFeedItem: FeedManager?
+    var isEditable: Bool = false    // 수정 모드
+    
     var feedStorageManager = FeedStorageManager()
     
     
@@ -27,6 +31,7 @@ class FeedViewController: UIViewController {
         return feedView
     }()
     
+    
     // MARK: - Initializations
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,12 +40,27 @@ class FeedViewController: UIViewController {
         configureConstraints()
         configureTextView()
         configureCollectionView()
-        
+
         feedView.delegate = self
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "추가", style: .plain, target: self, action: #selector(didAddFeed))
-        
+        if let _ = selectedFeedItem {
+            configureUI()
+            setupNavigationBar(isEditMode: false)
+        } else {
+            setupNavigationBar(isEditMode: true)
+        }
     }
+    
+    init(feedItem: FeedManager? = nil) {
+        self.selectedFeedItem = feedItem
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     
     // MARK: - Layouts
     private func configureConstraints() {
@@ -127,6 +147,39 @@ class FeedViewController: UIViewController {
         print("Feed saved successfully with ID: \(updatedFeedManager.id)")
     }
     
+    ///  FeedViewController가 초기화 될때 받아온 데이터로 UI 구성하는 함수
+    func configureUI() {
+        guard let feedItem = selectedFeedItem else { return }
+        
+        feedView.titleTextView.text = feedItem.feed.title
+        feedView.contentTextView.text = feedItem.feed.contents
+        feedView.titleTextView.isEditable = false
+        feedView.contentTextView.isEditable = false
+        feedView.selectedButton.isEnabled = false
+        feedView.selectedButton.alpha = 0.5
+        
+    }
+    
+    /// 네비게이션바 버튼 설정하는 함수
+    func setupNavigationBar(isEditMode: Bool) {
+        
+        if isEditMode {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "추가", style: .plain, target: self, action: #selector(didAddFeed))
+        } else {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: self, action: #selector(didTappedSettings))
+        }
+    }
+    
+    func enableEditingMode() {
+        feedView.titleTextView.isEditable = true
+        feedView.contentTextView.isEditable = true
+        feedView.selectedButton.isEnabled = true
+        feedView.selectedButton.alpha = 1.0
+        isEditable = true
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "완료", style: .plain, target: self, action: #selector(didFinishEditing))
+    }
+    
+    
     // MARK: - Action
     /// 네비게이션바의 추가 버튼을 누를 경우 동작할 액션
     @objc func didAddFeed() {
@@ -144,9 +197,61 @@ class FeedViewController: UIViewController {
         )
         
         let selectedImages = self.selectedImages
-        
         savedFeedItem(feed: newFeed, image: selectedImages)
+        navigationController?.popViewController(animated: true)
+    }
+    
+    /// 네비게이션바 오른쪽 버튼(설정)을 누르면 동작하는 액션
+    @objc func didTappedSettings() {
+        let actionSheet = UIAlertController(title: "설정", message: nil, preferredStyle: .actionSheet)
         
+        actionSheet.addAction(UIAlertAction(title: "수정", style: .default, handler: { _ in
+            self.enableEditingMode()
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "삭제", style: .destructive, handler: { _ in
+            self.deleteFeedItem()
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil ))
+        
+        present(actionSheet, animated: true)
+    }
+    
+    @objc private func didFinishEditing() {
+        // 수정된 내용을 저장하는 로직
+        guard let updatedTitle = feedView.titleTextView.text,
+              let updatedContent = feedView.contentTextView.text,
+              let currentFeedItem = selectedFeedItem else  { return }
+        
+        let updatedImages = selectedImages
+        
+        let updatedFeed = Feed(
+            title: updatedTitle,
+            contents: updatedContent,
+            date: currentFeedItem.feed.date,
+            imagePath: [])
+        
+        self.selectedImagesCount = currentFeedItem.feed.imagePath.count
+        feedView.selectedImageCollectionView.reloadData()
+        
+        feedView.titleTextView.isEditable = false
+        feedView.contentTextView.isEditable = false
+        feedView.selectedButton.isEnabled = false
+        feedView.selectedButton.alpha = 0.5
+        isEditable = false
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: self, action: #selector(didTappedSettings))
+        
+        FeedCoreDataManager().updateFeedItem(feedID: currentFeedItem.id, updatedFeed: updatedFeed, newImages: updatedImages)
+        
+        // self.savedFeedItem(feed: updatedFeed, image: updatedImages)
+    }
+    
+    func deleteFeedItem() {
+        guard let feedItem = selectedFeedItem else { return }
+        FeedStorageManager().deleteImages(from: feedItem.feed.imagePath)
+        FeedCoreDataManager.shared.deleteFeedItems(feedItem: feedItem)
         navigationController?.popViewController(animated: true)
     }
 }
@@ -193,14 +298,31 @@ extension FeedViewController: UITextViewDelegate {
 extension FeedViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return selectedImages.count
+        
+        if let feedItem = selectedFeedItem, !feedItem.feed.imagePath.isEmpty {
+            return feedItem.feed.imagePath.count
+        } else {
+            return selectedImages.count
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SelectedImageCollectionViewCell.identifier, for: indexPath) as? SelectedImageCollectionViewCell else { return UICollectionViewCell() }
         
-        let image = selectedImages[indexPath.row]
-        cell.configureSelectedImage(with: image)
+        var images: [UIImage] = []
+
+        if let feedItem = selectedFeedItem, !feedItem.feed.imagePath.isEmpty {
+            // 기존 피드에서 이미지 경로를 로드
+            images = FeedStorageManager().loadImages(from: feedItem.feed.imagePath)
+        } else {
+            // 새로운 피드 작성 모드에서 선택된 이미지를 사용
+            images = self.selectedImages
+        }
+
+        // 이미지가 있는 경우 셀 구성
+        if indexPath.item < images.count {
+            cell.configureSelectedImage(with: images[indexPath.item])
+        }
         
         return cell
     }
@@ -248,7 +370,6 @@ extension FeedViewController: PHPickerViewControllerDelegate {
                 if let image = image as? UIImage {
                     // 이미지를 로드한 경우
                     DispatchQueue.main.async {
-                        print("Selected image: \(image)")
                         self.selectedImages.append(image)
                         self.selectedImagesCount = self.selectedImages.count
                         self.updateUIAfterImageSelection()
