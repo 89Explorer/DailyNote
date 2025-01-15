@@ -26,6 +26,9 @@
 		9D1323F62CF3A9440037F684 /* FeedModel+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1323F12CF3A9440037F684 /* FeedModel+CoreDataClass.swift */; };
 		9D1323F92CF3ABD30037F684 /* FeedStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1323F82CF3ABD30037F684 /* FeedStorageManager.swift */; };
 		9D1323FC2CF419BC0037F684 /* FeedCoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1323FB2CF419BC0037F684 /* FeedCoreDataManager.swift */; };
+		9D223EC42D374FF800C56796 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D223EC32D374FF800C56796 /* LoginViewController.swift */; };
+		9D223F232D37566D00C56796 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D223F222D37566D00C56796 /* OnboardingViewController.swift */; };
+		9D223F272D37731C00C56796 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D223F262D37731C00C56796 /* RegisterViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +70,9 @@
 		9D1323F22CF3A9440037F684 /* FeedModel+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FeedModel+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		9D1323F82CF3ABD30037F684 /* FeedStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedStorageManager.swift; sourceTree = "<group>"; };
 		9D1323FB2CF419BC0037F684 /* FeedCoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCoreDataManager.swift; sourceTree = "<group>"; };
+		9D223EC32D374FF800C56796 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		9D223F222D37566D00C56796 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
+		9D223F262D37731C00C56796 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -78,6 +84,11 @@
 		9D1322972CEDB9B60037F684 /* DailyNoteUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = DailyNoteUITests;
+			sourceTree = "<group>";
+		};
+		9D223F212D37563B00C56796 /* Login&RegisterView */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Login&RegisterView";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -148,6 +159,9 @@
 			children = (
 				9D1323CC2CF2ACA80037F684 /* FeedViewController.swift */,
 				9D1323CD2CF2ACA80037F684 /* HomeViewController.swift */,
+				9D223EC32D374FF800C56796 /* LoginViewController.swift */,
+				9D223F222D37566D00C56796 /* OnboardingViewController.swift */,
+				9D223F262D37731C00C56796 /* RegisterViewController.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -191,6 +205,7 @@
 		9D1323E12CF2ACA80037F684 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				9D223F212D37563B00C56796 /* Login&RegisterView */,
 				9D1323DA2CF2ACA80037F684 /* FeedView */,
 				9D1323DE2CF2ACA80037F684 /* HomeView */,
 				9D1323E02CF2ACA80037F684 /* LaunchScreen.storyboard */,
@@ -238,6 +253,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9D223F212D37563B00C56796 /* Login&RegisterView */,
 			);
 			name = DailyNote;
 			packageProductDependencies = (
@@ -370,6 +388,8 @@
 				9D1323D72CF2ACA80037F684 /* DailyNote.xcdatamodeld in Sources */,
 				9D1323D02CF2ACA80037F684 /* FeedViewController.swift in Sources */,
 				9D1323E32CF2ACA80037F684 /* FeedView.swift in Sources */,
+				9D223F272D37731C00C56796 /* RegisterViewController.swift in Sources */,
+				9D223F232D37566D00C56796 /* OnboardingViewController.swift in Sources */,
 				9D1323FC2CF419BC0037F684 /* FeedCoreDataManager.swift in Sources */,
 				9D1323E42CF2ACA80037F684 /* SelectedImageCollectionViewCell.swift in Sources */,
 				9D1323EA2CF3A6650037F684 /* Feed.swift in Sources */,
@@ -379,6 +399,7 @@
 				9D1323E72CF2ACA80037F684 /* ImageCollectionViewCell.swift in Sources */,
 				9D1323D12CF2ACA80037F684 /* HomeViewController.swift in Sources */,
 				9D1322D32CEDBAD80037F684 /* AppDelegate.swift in Sources */,
+				9D223EC42D374FF800C56796 /* LoginViewController.swift in Sources */,
 				9D1323F32CF3A9440037F684 /* FeedModel+CoreDataProperties.swift in Sources */,
 				9D1323F42CF3A9440037F684 /* FeedModel+CoreDataClass.swift in Sources */,
 				9D1322D52CEDBAD80037F684 /* SceneDelegate.swift in Sources */,

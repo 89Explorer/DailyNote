@@ -28,6 +28,16 @@ class HomeViewController: UIViewController {
         configureTableView()
         setupNavigationBar()
         
+        var login: Bool = false
+        
+        if !login {
+            let onbaordVC = OnboardingViewController()
+            let nav = UINavigationController(rootViewController: onbaordVC)
+            nav.modalPresentationStyle = .fullScreen
+            self.present(nav, animated: true)
+        }
+        
+        
         feedItems = FeedCoreDataManager.shared.loadFeedItem()
         
     }
